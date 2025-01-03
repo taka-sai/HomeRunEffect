@@ -24,6 +24,7 @@
             color: gold;
             text-shadow: 0 0 10px gold, 0 0 20px orange, 0 0 30px red;
             animation: zoom-in-out 2s ease-in-out forwards;
+            z-index: 10;
         }
 
         @keyframes zoom-in-out {
@@ -40,57 +41,107 @@
                 opacity: 0;
             }
         }
-
-        .fireworks {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-        }
-
-        .spark {
-            position: absolute;
-            width: 4px;
-            height: 4px;
-            background-color: yellow;
-            border-radius: 50%;
-            animation: spark-animation 2s ease-out forwards;
-        }
-
-        @keyframes spark-animation {
-            0% {
-                transform: translate(0, 0) scale(1);
-                opacity: 1;
-            }
-            100% {
-                transform: translate(calc(var(--x) * 100px), calc(var(--y) * 100px)) scale(0.5);
-                opacity: 0;
-            }
-        }
     </style>
 </head>
 <body>
     <div class="home-run-text">ホームラン！</div>
-    <div class="fireworks"></div>
+    <div id="tsparticles"></div>
 
+    <!-- tsParticles ライブラリ -->
+    <script src="https://cdn.jsdelivr.net/npm/tsparticles@2.12.0"></script>
     <script>
-        function createFireworks() {
-            const fireworks = document.querySelector('.fireworks');
-            for (let i = 0; i < 50; i++) {
-                const spark = document.createElement('div');
-                spark.classList.add('spark');
-                spark.style.setProperty('--x', Math.random() * 2 - 1); // -1 to 1
-                spark.style.setProperty('--y', Math.random() * 2 - 1); // -1 to 1
-                spark.style.left = `${window.innerWidth / 2}px`;
-                spark.style.top = `${window.innerHeight / 2}px`;
-                fireworks.appendChild(spark);
+        // tsParticles 初期化
+        tsParticles.load("tsparticles", {
+            fpsLimit: 60,
+            particles: {
+                number: {
+                    value: 100,
+                    density: {
+                        enable: true,
+                        area: 800,
+                    },
+                },
+                color: {
+                    value: ["#ff0000", "#ffa500", "#ffff00", "#00ff00", "#00ffff", "#0000ff", "#ff00ff"],
+                },
+                shape: {
+                    type: "circle",
+                },
+                opacity: {
+                    value: 1,
+                    random: true,
+                    anim: {
+                        enable: true,
+                        speed: 1,
+                        opacity_min: 0,
+                        sync: false,
+                    },
+                },
+                size: {
+                    value: 5,
+                    random: true,
+                    anim: {
+                        enable: true,
+                        speed: 20,
+                        size_min: 0.1,
+                        sync: false,
+                    },
+                },
+                move: {
+                    enable: true,
+                    speed: 10,
+                    direction: "none",
+                    random: false,
+                    straight: false,
+                    out_mode: "destroy",
+                    attract: {
+                        enable: true,
+                        rotateX: 3000,
+                        rotateY: 3000,
+                    },
+                },
+            },
+            interactivity: {
+                detectsOn: "canvas",
+                events: {
+                    onHover: {
+                        enable: false,
+                    },
+                    onClick: {
+                        enable: false,
+                    },
+                },
+            },
+            detectRetina: true,
+            emitters: {
+                direction: "top",
+                life: {
+                    count: 0,
+                    duration: 0.1,
+                    delay: 0.1,
+                },
+                rate: {
+                    delay: 0.1,
+                    quantity: 10,
+                },
+                size: {
+                    width: 100,
+                    height: 0,
+                },
+                position: {
+                    x: 50,
+                    y: 50,
+                },
+            },
+        });
 
-                setTimeout(() => spark.remove(), 2000); // Cleanup
-            }
-        }
-
+        // 演出のタイミングを調整
         window.onload = () => {
-            setTimeout(createFireworks, 1000); // Trigger fireworks after text animation
+            setTimeout(() => {
+                const text = document.querySelector('.home-run-text');
+                text.style.display = 'none';
+                tsParticles.domItem(0).start(); // パーティクルのスタート
+            }, 2000); // テキスト消失後にパーティクル演出開始
         };
     </script>
 </body>
